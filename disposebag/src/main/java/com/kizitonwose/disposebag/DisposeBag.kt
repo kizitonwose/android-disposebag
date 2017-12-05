@@ -40,6 +40,7 @@ class DisposeBag(private val owner: LifecycleOwner,
 
     override fun delete(d: Disposable) = composite.delete(d)
 
+    fun clear() = composite.clear()
 
     override fun onPause(owner: LifecycleOwner) {
         if (event == Lifecycle.Event.ON_PAUSE) dispose()
