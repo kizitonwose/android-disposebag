@@ -13,13 +13,19 @@ import io.reactivex.internal.disposables.DisposableContainer
 
 fun Disposable.disposedBy(bag: DisposeBag) = bag.add(this)
 
-class DisposeBag(private val owner: LifecycleOwner,
-                 private val event: Lifecycle.Event = Lifecycle.Event.ON_DESTROY)
+object DisposeBagPlugins  {
+    @JvmStatic var defaultLifecycleDisposeEvent = Lifecycle.Event.ON_DESTROY
+}
+
+class DisposeBag @JvmOverloads constructor(private val owner: LifecycleOwner,
+                                           private val event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
     : Disposable, DisposableContainer, DefaultLifecycleObserver {
 
-    constructor(resources: Iterable<Disposable>,
-                owner: LifecycleOwner,
-                event: Lifecycle.Event = Lifecycle.Event.ON_DESTROY) : this(owner = owner, event = event) {
+    @JvmOverloads constructor(resources: Iterable<Disposable>,
+                              owner: LifecycleOwner,
+                              event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
+            : this(owner = owner, event = event) {
+
         resources.forEach { composite.add(it) }
     }
 
