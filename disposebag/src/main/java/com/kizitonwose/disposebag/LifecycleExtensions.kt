@@ -9,7 +9,9 @@ import io.reactivex.disposables.Disposable
  * Created by Kizito Nwose
  */
 
-fun Disposable.disposedBy(owner: LifecycleOwner, event: Lifecycle.Event = Lifecycle.Event.ON_DESTROY) {
+fun Disposable.disposedWith(owner: LifecycleOwner,
+                          event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent) {
+
     owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
 
         override fun onPause(owner: LifecycleOwner) {

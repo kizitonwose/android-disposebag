@@ -59,7 +59,7 @@ class DisposeBagTest {
                 .subscribe {
                     emittedItems.add(it)
                     System.out.println(it)
-                }.disposedBy(lifecycleOwner)
+                }.disposedWith(lifecycleOwner)
 
         assertTrue(emittedItems.isEmpty())
 
