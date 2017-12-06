@@ -30,7 +30,7 @@ class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
     }
 
     private val lifecycle = owner.lifecycle
-    // We could extend CompositeDisposable but the class is final
+
     private val composite by lazy { CompositeDisposable() }
 
     init {
