@@ -1,4 +1,4 @@
-package com.kizitonwose.disposebag
+package com.kizitonwose.android.disposebag
 
 import android.arch.lifecycle.Lifecycle
 import io.reactivex.Observable
