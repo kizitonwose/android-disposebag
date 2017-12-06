@@ -13,7 +13,7 @@ import io.reactivex.internal.disposables.DisposableContainer
 
 fun Disposable.disposedBy(bag: DisposeBag) = bag.add(this)
 
-object DisposeBagPlugins  {
+object DisposeBagPlugins {
     @JvmStatic var defaultLifecycleDisposeEvent = Lifecycle.Event.ON_DESTROY
 }
 
@@ -38,15 +38,16 @@ class DisposeBag @JvmOverloads constructor(private val owner: LifecycleOwner,
 
     override fun isDisposed() = composite.isDisposed
 
-    override fun dispose() = composite.dispose()
+    override fun dispose() {
+        owner.lifecycle.removeObserver(this)
+        composite.dispose()
+    }
 
     override fun add(d: Disposable) = composite.add(d)
 
     override fun remove(d: Disposable) = composite.remove(d)
 
     override fun delete(d: Disposable) = composite.delete(d)
-
-    fun clear() = composite.clear()
 
     override fun onPause(owner: LifecycleOwner) {
         if (event == Lifecycle.Event.ON_PAUSE) dispose()
