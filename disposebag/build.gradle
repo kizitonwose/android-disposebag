@@ -2,6 +2,12 @@ apply plugin: 'com.android.library'
 
 apply plugin: 'kotlin-android'
 
+apply plugin: 'maven'
+
+apply plugin: 'com.vanniktech.android.junit.jacoco'
+
+group = 'com.github.kizitonwose'
+
 android {
     compileSdkVersion 27
 
@@ -33,7 +39,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 
     //lifecycle
     implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
