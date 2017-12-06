@@ -17,29 +17,30 @@ object DisposeBagPlugins {
     @JvmStatic var defaultLifecycleDisposeEvent = Lifecycle.Event.ON_DESTROY
 }
 
-class DisposeBag @JvmOverloads constructor(private val owner: LifecycleOwner,
+class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
                                            private val event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
     : Disposable, DisposableContainer, DefaultLifecycleObserver {
 
     @JvmOverloads constructor(resources: Iterable<Disposable>,
                               owner: LifecycleOwner,
                               event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
-            : this(owner = owner, event = event) {
+            : this(owner, event) {
 
         resources.forEach { composite.add(it) }
     }
 
+    private val lifecycle = owner.lifecycle
     // We could extend CompositeDisposable but the class is final
     private val composite by lazy { CompositeDisposable() }
 
     init {
-        owner.lifecycle.addObserver(this)
+        lifecycle.addObserver(this)
     }
 
     override fun isDisposed() = composite.isDisposed
 
     override fun dispose() {
-        owner.lifecycle.removeObserver(this)
+        lifecycle.removeObserver(this)
         composite.dispose()
     }
 
