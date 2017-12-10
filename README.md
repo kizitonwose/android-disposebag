@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 ```java
 public final class MainActivity extends AppCompatActivity {
 
-    final DisposeBag bag = DisposeBag(this);
+    final DisposeBag bag = new DisposeBag(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
