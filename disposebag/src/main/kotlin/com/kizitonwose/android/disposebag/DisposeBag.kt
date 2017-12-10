@@ -11,7 +11,7 @@ import io.reactivex.internal.disposables.DisposableContainer
  * Created by Kizito Nwose
  */
 
-fun Disposable.disposedBy(bag: DisposeBag) = bag.add(this)
+
 
 object DisposeBagPlugins {
     @JvmStatic var defaultLifecycleDisposeEvent = Lifecycle.Event.ON_DESTROY
