@@ -15,6 +15,10 @@ class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
                                            private val event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
     : Disposable, DisposableContainer, DefaultLifecycleObserver {
 
+    private val lifecycle = owner.lifecycle
+
+    private val composite by lazy { CompositeDisposable() }
+
     @JvmOverloads constructor(resources: Iterable<Disposable>,
                               owner: LifecycleOwner,
                               event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
@@ -22,10 +26,6 @@ class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
 
         resources.forEach { composite.add(it) }
     }
-
-    private val lifecycle = owner.lifecycle
-
-    private val composite by lazy { CompositeDisposable() }
 
     init {
         lifecycle.addObserver(this)
@@ -38,22 +38,28 @@ class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
         composite.dispose()
     }
 
-    override fun add(d: Disposable) = composite.add(d)
+    override fun add(disposable: Disposable) = composite.add(disposable)
 
-    override fun remove(d: Disposable) = composite.remove(d)
+    override fun remove(disposable: Disposable) = composite.remove(disposable)
 
-    override fun delete(d: Disposable) = composite.delete(d)
+    override fun delete(disposable: Disposable) = composite.delete(disposable)
 
     override fun onPause(owner: LifecycleOwner) {
-        if (event == Lifecycle.Event.ON_PAUSE) dispose()
+        if (event == Lifecycle.Event.ON_PAUSE) {
+            dispose()
+        }
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        if (event == Lifecycle.Event.ON_STOP) dispose()
+        if (event == Lifecycle.Event.ON_STOP) {
+            dispose()
+        }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        if (event == Lifecycle.Event.ON_DESTROY) dispose()
+        if (event == Lifecycle.Event.ON_DESTROY) {
+            dispose()
+        }
     }
 }
 
