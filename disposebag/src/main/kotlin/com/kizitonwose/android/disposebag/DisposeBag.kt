@@ -11,12 +11,6 @@ import io.reactivex.internal.disposables.DisposableContainer
  * Created by Kizito Nwose
  */
 
-
-
-object DisposeBagPlugins {
-    @JvmStatic var defaultLifecycleDisposeEvent = Lifecycle.Event.ON_DESTROY
-}
-
 class DisposeBag @JvmOverloads constructor(owner: LifecycleOwner,
                                            private val event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent)
     : Disposable, DisposableContainer, DefaultLifecycleObserver {
