@@ -5,12 +5,10 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
 import io.reactivex.disposables.Disposable
 
-/**
- * Created by Kizito Nwose
- */
+fun Disposable.disposedBy(bag: DisposeBag) = bag.add(this)
 
 fun Disposable.disposedWith(owner: LifecycleOwner,
-                          event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent) {
+                            event: Lifecycle.Event = DisposeBagPlugins.defaultLifecycleDisposeEvent) {
 
     owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
 
@@ -32,7 +30,7 @@ fun Disposable.disposedWith(owner: LifecycleOwner,
             }
         }
 
-        fun removeObserverAndDispose(owner: LifecycleOwner) {
+        private fun removeObserverAndDispose(owner: LifecycleOwner) {
             owner.lifecycle.removeObserver(this)
             dispose()
         }

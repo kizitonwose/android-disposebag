@@ -19,11 +19,14 @@ class DisposeBagTest {
     private lateinit var lifecycleOwner: TestLifecycleOwner
     private lateinit var testScheduler: TestScheduler
 
+    private lateinit var disposeBag: DisposeBag
+
     @Before
     fun before() {
         lifecycleOwner = TestLifecycleOwner()
         testScheduler = TestScheduler()
         lifecycleOwner.lifecycleRegistry.markState(Lifecycle.State.CREATED)
+        disposeBag = DisposeBag(lifecycleOwner)
     }
 
 
@@ -33,22 +36,22 @@ class DisposeBagTest {
     }
 
     @Test
-    fun disposedByDisposeBag() {
-        val disposeBag = DisposeBag(lifecycleOwner)
-
+    fun shouldDisposeOnDefaultEndEvent() {
+        //Arrange
         val emittedItems = mutableListOf<Long>()
 
+        //Act
         val disposable = Observable.interval(5, TimeUnit.SECONDS, testScheduler)
                 .subscribe {
                     emittedItems.add(it)
-                    System.out.println(it)
                 }.apply { disposedBy(disposeBag) }
 
-        assertTrue(emittedItems.isEmpty())
+        //Assert
+        assertEmptyList(emittedItems)
 
         testScheduler.advanceTimeBy(20, TimeUnit.SECONDS)
 
-        assertTrue(emittedItems.size == 4)
+        assertListHasSize(emittedItems, 4)
 
         lifecycleOwner.performDestroy()
 
@@ -56,27 +59,37 @@ class DisposeBagTest {
 
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
 
-        assertTrue(emittedItems.size == 4)
+        assertListHasSize(emittedItems, 4)
     }
 
     @Test
-    fun disposeMultipleByDisposeBagWithCustomEvent() {
+    fun shouldDisposeAllDisposablesWhenEndEventOccurs() {
+        //Arrange
         lifecycleOwner.lifecycleRegistry.markState(Lifecycle.State.STARTED)
+        val emmittedItems = mutableListOf<Long>()
 
+        //Act
         val disposable1 = Observable.interval(5, TimeUnit.SECONDS, testScheduler)
                 .subscribe {
-                    System.out.println(it)
+                    emmittedItems.add(it)
                 }
 
-        val disposable2 = Observable.fromIterable(1..100)
-                .delay(10, TimeUnit.SECONDS)
+        val disposable2 = Observable.fromIterable(1..3)
+                .delay(10, TimeUnit.SECONDS, testScheduler)
                 .subscribe {
-                    System.out.println(it)
+                    emmittedItems.add(it.toLong())
                 }
 
-        val disposeBag = DisposeBag(listOf(disposable1, disposable2),
+        disposeBag = DisposeBag(listOf(disposable1, disposable2),
                 lifecycleOwner, Lifecycle.Event.ON_STOP)
 
+        assertEmptyList(emmittedItems)
+
+        testScheduler.advanceTimeBy(5 , TimeUnit.SECONDS)
+
+        assertListHasSize(emmittedItems, 1)
+
+        //Assert
         assertFalse(disposable1.isDisposed)
         assertFalse(disposable2.isDisposed)
         assertFalse(disposeBag.isDisposed)
@@ -89,7 +102,7 @@ class DisposeBagTest {
     }
 
     @Test
-    fun disposedWithLifecycle() {
+    fun shouldDisposeWithLifeCycleWhenDefaultEndEventOccurs() {
         val emittedItems = mutableListOf<Long>()
 
         Observable.interval(5, TimeUnit.SECONDS, testScheduler)
@@ -98,21 +111,21 @@ class DisposeBagTest {
                     System.out.println(it)
                 }.disposedWith(lifecycleOwner)
 
-        assertTrue(emittedItems.isEmpty())
+        assertEmptyList(emittedItems)
 
         testScheduler.advanceTimeBy(20, TimeUnit.SECONDS)
 
-        assertTrue(emittedItems.size == 4)
+        assertListHasSize(emittedItems, 4)
 
         lifecycleOwner.performDestroy()
 
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS)
 
-        assertTrue(emittedItems.size == 4)
+        assertListHasSize(emittedItems, 4)
     }
 
     @Test
-    fun disposedWithLifecycleCustomEvent() {
+    fun shouldDisposeWithLifecycleWhenCustomEventOccurs() {
         testLifecycleWithCustomEvent(Lifecycle.State.CREATED, Lifecycle.Event.ON_DESTROY)
         testLifecycleWithCustomEvent(Lifecycle.State.RESUMED, Lifecycle.Event.ON_PAUSE)
         testLifecycleWithCustomEvent(Lifecycle.State.STARTED, Lifecycle.Event.ON_STOP)
@@ -124,7 +137,6 @@ class DisposeBagTest {
         val disposable = Observable.fromIterable(1..100)
                 .delay(10, TimeUnit.SECONDS)
                 .subscribe {
-                    System.out.println(it)
                 }.apply { disposedWith(lifecycleOwner, endEvent) }
 
         assertFalse(disposable.isDisposed)
@@ -135,16 +147,14 @@ class DisposeBagTest {
     }
 
     @Test
-    fun overrideGlobalEvent(){
+    fun overrideGlobalEventShouldDisposeOnGlobalEventEmission(){
         DisposeBagPlugins.defaultLifecycleDisposeEvent = Lifecycle.Event.ON_PAUSE
 
         lifecycleOwner.lifecycleRegistry.markState(Lifecycle.State.RESUMED)
-
-        val disposeBag = DisposeBag(lifecycleOwner)
+        disposeBag = DisposeBag(lifecycleOwner)
 
         val disposable = Observable.interval(5, TimeUnit.SECONDS, testScheduler)
                 .subscribe {
-                    System.out.println(it)
                 }.apply { disposedBy(disposeBag) }
 
         assertFalse(disposable.isDisposed)
@@ -154,6 +164,14 @@ class DisposeBagTest {
 
         assertTrue(disposable.isDisposed)
         assertTrue(disposeBag.isDisposed)
+    }
+
+    private fun assertEmptyList(emittedItems: MutableList<Long>) {
+        assertTrue(emittedItems.isEmpty())
+    }
+
+    private fun assertListHasSize(emittedItems: MutableList<Long>, size: Int) {
+        assertTrue(emittedItems.size == size)
     }
 
 }
