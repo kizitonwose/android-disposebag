@@ -13,7 +13,7 @@ This library uses the new LifecycleObserver introduced in Android Architecture C
 
 ### Using a DisposeBag
 
-Create a DisposeBag, supply your LifecycleOwner, then add all your disposbles.
+Create a DisposeBag, supply your LifecycleOwner, then add all your disposables.
 
 The example below uses an Activity but this also works with Fragments or any other class that impements the LifecycleOwner interface.
 
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 ```java
 public final class MainActivity extends AppCompatActivity {
 
-    final DisposeBag bag = new DisposeBag(this);
+    final DisposeBag bag = new DisposeBag(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
