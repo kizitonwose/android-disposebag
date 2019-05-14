@@ -164,6 +164,19 @@ dependencies {
 }
 ```
 
+#### Note: 
+
+If you get the error: **Default interface methods are only supported starting with Android N (--min-api 24)** after installing this library, this means that you need to compile your project with JDK 8. You can do this by adding the `compileOptions` block in the `android` block of your app-level build.gradle file: 
+
+```groovy
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+```
+
 ## Contributing
 
 This library is a combination of some extension functions and classes I wrote in a project of mine, improvements are welcome.
